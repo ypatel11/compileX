@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="codemirror/codemirror-5.65.16/lib/codemirror.css">
+    <script src="codemirror/codemirror-5.65.16/lib/codemirror.js"></script>
+    <script src="codemirror/codemirror-5.65.16/mode/clike/clike.js"></script>
+    <link rel="stylesheet" href="codemirror/codemirror-5.65.16/theme/dracula.css">
+    <script src="codemirror/codemirror-5.65.16/addon/edit/closebrackets.js"></script>
+    <script src="codemirror/codemirror-5.65.16/addon/edit/matchbrackets.js"></script>
+    <link rel="stylesheet" href="codemirror/codemirror-5.65.16/theme/ayu-dark.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="codemirror/codemirror-5.65.16/mode/python/python.js"></script>
+</head>
+<body>
+    <div class="main" style="display: flex;">
+        <div class="left" style=" margin-top: 40px;margin-left: 50px;">
+            <div class="code" style=" border: 2px solid red;width: 100%;">
+               
+                    <textarea name="Code" id="code" style="font-size: 50pt;resize:none;border-radius: 20px;"></textarea>
+              
+            </div>
+
+            <div class="langs" style="display: flex; gap :60%;margin: 20px 50px;">
+                <div class="sel">
+                    <select name="" id="opt" style="width: 170px;font-size: 15px;border-radius: 6px;height: 40px;cursor: pointer;">
+                        <option selected>Select Langauage</option>
+                        <option value="JAVA">JAVA</option>
+                        <option value="C">C</option>
+                        <option value="C++">C++</option>
+                        <option value="Python">Python</option>
+
+                    </select>
+                </div>
+
+                <div class="run">
+                    <button id="bttn" style="color: white;background-color: green;height: 40px;width: 150px;font-size: 20px;border-radius: 10px;cursor: pointer;"><i class="fa fa-play-circle" aria-hidden="true"></i> RUN</button>
+                </div>
+                   
+            </div>
+
+
+
+        </div>
+
+        <div class="right" style="background-color: rgba(30, 27, 27, 0.863);margin-left: 5%;width: 450px;margin-right: 5%;margin-top: 3%;margin-bottom: 5%;border-radius: 10px;" >
+            <div class="inp" style="margin-left: 18%;margin-top: 20px;">
+                <label for="" style="color: white;font-size: 20px;">Input</label>
+                <br>   <br>
+                <textarea name="" id="inp" cols="25" rows="10"> </textarea>
+            </div>
+            <div class="out" style="margin-left: 18%;margin-top: 20px;font-size: 20px;">
+                <label for="" style="color: white;">Output</label>
+                <br>   <br>
+                <textarea name="" id="out" cols="25" rows="10"></textarea>
+
+            </div>
+        </div>
+       
+        
+    </div>
+</body>
+<script>
+     var editor = CodeMirror.fromTextArea(document.getElementById("code"), {
+        mode: "text/x-c++src",
+        theme: "dracula",
+        lineNumbers: true,
+        autoCloseBrackets: true,
+        matchBrackets:true,
+
+
+    })
+    var width = window.innerWidth;
+    editor.setSize(0.65 * width, "500")
+
+    // changin code editor langauge 
+
+    var option = document.getElementById("opt")
+    option.addEventListener("change",()=>{
+        if(option.value=='JAVA'){
+                editor.setOption("mode","text/x-java")
+        }
+        else if(option.value=='C++'){
+            editor.setOption("mode","text/x-c++src")
+        }
+        else if(option.value=='C'){
+            editor.setOption("mode","text/x-csrc")
+        }
+        else if(option.value=='PYTHON'){
+            editor.setOption("mode","text/x-python")
+        }
+
+        //using fetch 
+
+        var input = document.getElementById('inp');
+        var output = document.getElementById('out');
+        var button = document.getElementById('bttn');
+         
+        var code;
+        button.addEventListener("click",async()=>{
+                code={
+                    code:editor.getValue(),
+                    input:input.value,
+                    lang:option.value
+
+                }
+                var Odata = await fetch("http://localhost:3000/compile",{
+                    method:"POST",
+                    headers:{
+                        "Content-Type":"application/json"
+                    },
+                    body:JSON.stringify(code)
+                })
+
+                var d = await Odata.json();
+                if(d.output==undefined){
+                    alert("THERE IS ERROR IN CODE ")
+                }
+                else{
+                     output.value = d.output;
+                }
+           
+            
+        })
+
+
+    })
+</script>
+
+</html>
